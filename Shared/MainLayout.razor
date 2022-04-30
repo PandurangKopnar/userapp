@@ -1,0 +1,55 @@
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inherits LayoutComponentBase
+@inject ProtectedSessionStorage storage
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<PageTitle>UserApp</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <NavLink class="nav-link" href="login\login">
+                <span class="oi" aria-hidden="true"></span> @Login
+            </NavLink>
+             <NavLink class="nav-link" href="login\logout">
+                <span class="oi" aria-hidden="true"></span> @Logout
+            </NavLink>
+            <NavLink class="nav-link" href="login\register">
+                <span class="oi" aria-hidden="true"></span> Register
+            </NavLink>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code{
+    public string Name;
+    public string Login;
+    public string Logout;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        Name =  await sessionStorage.GetItemAsync<string>("username");
+        if (string.IsNullOrEmpty(Name))
+        {
+            Login = "Login";
+            Logout = null;
+        }
+        else
+        {
+            Logout = "Logout";
+            Login = null;
+        }
+    }
+    }
+  
+
+    
+}

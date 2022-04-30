@@ -1,0 +1,62 @@
+﻿@page "/login/register"
+@using UserApp.ViewModels
+@inject RegisterViewModel register
+ <div class="card col-md-4 justify-content-center">
+        <h4 class="card-card-header">Login</h4>
+        <div class="card-body ">
+           
+            <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="card-group">
+                    <label>FirstName</label>
+                    <InputText @bind-Value="model.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => model.FirstName)" />            
+                </div>
+                 <div class="card-group">
+                    <label>LastName</label>
+                    <InputText @bind-Value="model.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => model.LastName)" />            
+                </div>
+                 <div class="card-group">
+                    <label>Mobile</label>
+                    <InputText @bind-Value="model.Mobile" class="form-control" />
+                    <ValidationMessage For="@(() => model.Mobile)" />            
+                </div>
+                 <div class="card-group">
+                    <label>Email</label>
+                    <InputText @bind-Value="model.Email" class="form-control" />
+                    <ValidationMessage For="@(() => model.Email)" />            
+                </div>
+                <div class="card-group">
+                    <label>UserName</label>
+                    <InputText @bind-Value="model.UserName" class="form-control" />
+                    <ValidationMessage For="@(() => model.UserName)" />            
+                </div>
+                 <div class="card-group">
+                    <label>Password</label>
+                    <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => model.Password)" />            
+                </div>
+                <div><br/></div>
+                 <button disabled="@loading" class="btn btn-primary">
+                @if (loading) 
+                {
+                    <span class="spinner-border spinner-border-sm flex-md-row"></span>
+                }
+                Submit
+            </button>
+             <NavLink href="login/login" class="btn btn-link">Login</NavLink>
+            </EditForm>
+
+        </div>
+    </div>
+
+@code {
+    private Models.Login.RegisterModel model = new Models.Login.RegisterModel();
+    private bool loading;
+     private async void OnValidSubmit()
+    {
+        loading = true;
+        int result = await register.AddUser(model);
+    }
+}

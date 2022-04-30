@@ -1,0 +1,91 @@
+﻿@page "/login/login"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using UserApp.Models
+@using UserApp.ViewModels
+@inject LoginViewModel login
+@inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage storage 
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+    <div class="card col-md-4 justify-content-center">
+        <h4 class="card-card-header">Login</h4>
+        <div class="card-body ">
+           
+            <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="card-group">
+                    <label>Username</label>
+                    <InputText @bind-Value="model.Username" class="form-control" />
+                    <ValidationMessage For="@(() => model.Username)" />            
+                </div>
+                 <div class="card-group">
+                    <label>Password</label>
+                    <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => model.Password)" />            
+                </div>
+                <div><br/></div>
+                 <button disabled="@loading" class="btn btn-primary">
+                @if (loading) 
+                {
+                    <span class="spinner-border spinner-border-sm flex-md-row"></span>
+                }
+                Login
+            </button>
+             <NavLink href="login/register" class="btn btn-link">Register</NavLink>
+            </EditForm>
+
+        </div>
+        <a href="login\userList">@Title</a>
+    </div>
+
+@code {
+    private Models.Login.LoginModel model = new Models.Login.LoginModel();
+    private bool loading;
+    private string Title = null;
+    private async void OnValidSubmit()
+    {
+        loading = true;
+        try
+        {
+            User result = await login.ValidateUser(model);
+            if (result != null)
+            {
+                await sessionStorage.SetItemAsync("userId", result.userId);
+                await sessionStorage.SetItemAsync("username", result.userName);
+                await storage.SetAsync("username", result.userName);
+                var username = await storage.GetAsync<string>("username");
+                Title = "Get User List";
+                loading = false;
+                
+                StateHasChanged();
+                NavigationManager.NavigateTo("login/userlist");
+            }
+            
+        }
+        catch(Exception ex)
+        {
+            loading = false;
+            Title = null;
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var username = await storage.GetAsync<string>("username");
+            string nm = username.Value;
+            if (!string.IsNullOrEmpty(nm))
+            {
+                Title = "Get User List";
+            }
+            else
+            {
+                Title = null;
+            }
+        }
+        catch(Exception ex)
+        {
+            
+        }
+    }
+}
